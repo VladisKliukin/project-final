@@ -4,7 +4,8 @@
 
 ## REST API
 
-- Swagger UI: [http://localhost:8080/doc](http://localhost:8080/doc)
+- Swagger UI через `nginx`: [http://localhost/doc](http://localhost/doc)
+- Прямой backend: [http://localhost:8080/doc](http://localhost:8080/doc)
 
 ## Технологии
 
@@ -17,11 +18,12 @@
 - Thymeleaf
 - Docker
 - Docker Compose
+- Nginx
 
 ## Структура проекта
 
 - `src/main/java` - основной Java-код
-- `src/main/resources` - application-конфиги, liquibase, sql
+- `src/main/resources` - application-конфиги, Liquibase, SQL
 - `resources/view` - HTML-шаблоны
 - `resources/static` - CSS, JS, шрифты, картинки
 - `config` - дополнительные конфиги, включая `nginx.conf`
@@ -29,12 +31,10 @@
 
 ## Переменные окружения
 
-Приложение читает чувствительные данные из environment variables.
+Чувствительные данные вынесены из `application.yaml` в environment variables.
 
-Для локальной работы используется файл [`.env.example`](</C:/ProjectJavaRush/.env.example>) как шаблон.
-Нужно создать локальный [`.env`](</C:/ProjectJavaRush/.env>) и заполнить его значениями.
-
-Используемые переменные:
+Для локальной работы используется [`.env.example`](</C:/ProjectJavaRush/.env.example>) как шаблон.
+Локально нужно создать [`.env`](</C:/ProjectJavaRush/.env>) и заполнить его значениями.
 
 ```env
 DB_USERNAME=
@@ -55,15 +55,17 @@ MAIL_PASSWORD=
 
 ## Запуск через Docker
 
-Текущий основной способ запуска проекта:
+Основной способ запуска проекта:
 
 ```powershell
 docker compose up --build
 ```
 
-После старта приложение доступно по адресу:
+После старта доступны:
 
-- [http://localhost:8080](http://localhost:8080)
+- [http://localhost](http://localhost) - вход через `nginx`
+- [http://localhost:8080](http://localhost:8080) - прямой доступ к Spring Boot
+- [http://localhost/doc](http://localhost/doc) - Swagger через `nginx`
 
 Остановка контейнеров:
 
@@ -71,45 +73,41 @@ docker compose up --build
 docker compose down
 ```
 
-## Что уже сделано
+Если менялся `config/nginx.conf`, может понадобиться перезапуск контейнера `nginx`.
 
-- Разобрана структура проекта и основные модули.
-- Удалены OAuth-провайдеры `vk` и `yandex` из backend-конфига.
-- Удалены `vk` и `yandex` из UI на страницах логина и регистрации.
-- Чувствительные данные вынесены из `application.yaml` в environment variables.
+## Прогресс
+
+### Выполнено
+
+- Onboarding по проекту и разбор структуры.
+- Удалены `vk` и `yandex` из OAuth-конфига и UI.
+- Секреты вынесены из `application.yaml` в environment variables.
 - Добавлены [`.env.example`](</C:/ProjectJavaRush/.env.example>) и локальный `.env`.
-- Создан `Dockerfile` для сборки и запуска приложения.
-- Создан базовый `docker-compose.yml` для запуска приложения и PostgreSQL.
-- Исправлен конфликт бинов в `RestAuthenticationEntryPoint`, из-за которого приложение не стартовало.
+- Создан `Dockerfile`.
+- Создан `docker-compose.yml` для `db + app + nginx`.
+- `config/nginx.conf` адаптирован под Docker Compose.
+- Исправлен запуск приложения через `RestAuthenticationEntryPoint`.
+- Подтвержден рабочий запуск `PostgreSQL + Spring Boot + Nginx`.
 
-## Что осталось сделать
+### Осталось сделать
 
-- Добавить `nginx` в `docker-compose.yml`.
-- Проверить и описать полноценный запуск `app + db + nginx`.
 - Разобраться с проблемами авторизации и регистрации.
 - Проверить OAuth redirect URI для Google.
 - Перевести тесты на H2.
-- Написать дополнительные тесты для `ProfileRestController`.
+- Написать тесты для `ProfileRestController`.
 - Сделать рефакторинг `FileUtil#upload`.
 - Реализовать теги для задач.
 - Реализовать подсчет времени по статусам.
-- Обновлять этот README по мере выполнения задач.
+
+## Выполненные пункты задания
+
+- Разобраться со структурой проекта.
+- Видалити соціальні мережі: `vk`, `yandex`.
+- Винести чутливу інформацію до environment variables.
+- Написати Dockerfile для основного сервера.
+- Написати docker-compose для запуску сервера разом з БД та nginx.
 
 ## Известные проблемы
 
 - Google OAuth сейчас падает с ошибкой `redirect_uri_mismatch`.
-- Блок авторизации и регистрации нужно отдельно проверить целиком после стабилизации инфраструктуры.
-
-## Дневник разработки
-
-### Сделано
-
-- Поднят проект в Docker без локальной установки Java 17 и PostgreSQL.
-- Подтвержден рабочий старт Spring Boot внутри контейнера.
-- Убраны неиспользуемые соцсети `vk` и `yandex`.
-
-### Следующие шаги
-
-- Довести Docker-конфигурацию до варианта с `nginx`.
-- После этого вернуться к блоку авторизации и регистрации.
-- По итогам каждого этапа обновлять этот README.
+- Блок авторизации и регистрации нужно отдельно проверить после стабилизации инфраструктуры.
