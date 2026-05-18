@@ -33,4 +33,8 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
             throw new ServletException(e);
         }
     }
+
+
+
 }
+
